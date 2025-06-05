@@ -167,6 +167,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
 def plot_convergence_analysis(csv_file_path):
+    plt.rcParams['font.sans-serif']=['Microsoft YaHei']
+
     base_dir = os.path.dirname(csv_file_path)
     df = pd.read_csv(csv_file_path)
     
@@ -175,6 +177,7 @@ def plot_convergence_analysis(csv_file_path):
     residual_columns = ['Residual_Poisson_L2', 'Residual_Poisson_Linf',
                        'Residual_n_L2', 'Residual_n_Linf',
                        'Residual_p_L2', 'Residual_p_Linf']
+    plot_max_iteration_vs_va(csv_file_path)
     
     for va in df['Va'].unique():
         va_dir = os.path.join(base_dir, f"Va={va}")
@@ -224,7 +227,60 @@ def plot_convergence_analysis(csv_file_path):
         
         create_individual_plots(va_df, va_dir, va, error_columns + residual_columns + ['Total_Error'])
 
+def plot_max_iteration_vs_va(csv_file_path):
+    # 设置中文字体
+    plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
+    
+    # 读取数据
+    df = pd.read_csv(csv_file_path)
+    
+    # 获取每个Va对应的最大迭代次数
+    max_iter_df = df.groupby('Va')['Iteration'].max().reset_index()
+    
+    # 创建图像
+    plt.figure(figsize=(10, 6))
+    
+    # 绘制折线图（带数据点标记）
+    plt.plot(max_iter_df['Va'], 
+             max_iter_df['Iteration'], 
+             marker='o', 
+             markersize=8,
+             linestyle='-',
+             linewidth=2,
+             color="#D4608D")
+    
+    # 设置标题和坐标轴标签
+    plt.title("Iteration Numbers of Gummel Method", fontsize=24, pad=20)
+    plt.xlabel("Applied Voltage", fontsize=20)
+    plt.ylabel("Iteration Number", fontsize=20)
+    
+    # 设置坐标轴参数
+    ax = plt.gca()
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=10))  # 控制x轴刻度密度
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))  # 强制y轴显示整数
+    
+    # 设置网格线
+    ax.grid(True, 
+           which='both', 
+           linestyle='--', 
+           linewidth=0.5,
+           alpha=0.7)
+    
+    # 自动调整布局并保存
+    plt.tight_layout()
+    
+    # 生成保存路径
+    save_dir = os.path.dirname(csv_file_path)
+    save_path = os.path.join(save_dir, "Max_Iteration_vs_Va.pdf")
+    
+    plt.savefig(save_path, dpi=600, bbox_inches='tight')
+    plt.close()
+    
+    print(f"图表已保存至：{save_path}")
+
 def create_individual_plots(df, save_dir, va, columns):
+    plt.rcParams['font.sans-serif']=['Microsoft YaHei']
+
     for col in columns:
         plt.figure(figsize=(8, 5))
         plt.semilogy(df['Iteration'], df[col], marker='o', color='teal')

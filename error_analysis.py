@@ -119,7 +119,7 @@ class ErrorAnalysis():
         residuals['Residual_Poisson_L2'] = np.sqrt(np.mean(residual[1:-1]**2))
         residuals['Residual_Poisson_Linf'] = np.max(residual[1:-1])
         
-        return residuals
+        return residuals, residual
     
     def calculate_continuity_residuals(self, V, n, p, cont_n, cont_p, Un, Up):
         """
@@ -193,7 +193,7 @@ class ErrorAnalysis():
         residuals['Residual_p_L2'] = np.sqrt(np.mean(residual_p[1:-1]**2))
         residuals['Residual_p_Linf'] = np.max(residual_p[1:-1])
         
-        return residuals
+        return residuals, residual_n, residual_p
     
     def log_iteration_data(self, Va_step, Va, V_old, V_new, n_old, n_new, p_old, p_new, 
                           poiss, cont_n, cont_p, Un, Up, total_error):
@@ -225,8 +225,8 @@ class ErrorAnalysis():
         
         # Calculate all errors and residuals
         iter_errors = self.calculate_iteration_errors(V_old, V_new, n_old, n_new, p_old, p_new)
-        poisson_residuals = self.calculate_poisson_residual(V_new, n_new, p_new, poiss)
-        continuity_residuals = self.calculate_continuity_residuals(V_new, n_new, p_new, cont_n, cont_p, Un, Up)
+        poisson_residuals , _ = self.calculate_poisson_residual(V_new, n_new, p_new, poiss)
+        continuity_residuals , _, _= self.calculate_continuity_residuals(V_new, n_new, p_new, cont_n, cont_p, Un, Up)
         
         # Combine all results
         all_data = {
@@ -249,6 +249,40 @@ class ErrorAnalysis():
         
         # Write to CSV file
         self.write_to_csv(all_data)
+    
+    def calculate_pde_residual(self, Va_step, Va, V_old, V_new, n_old, n_new, p_old, p_new, 
+                          poiss, cont_n, cont_p, Un, Up, total_error):
+        """
+        Calculate all errors and residuals in vector
+        
+        Parameters:
+        -----------
+        Va_step : int
+            Current voltage step number
+        Va : float
+            Applied voltage value
+        V_old, V_new : numpy arrays
+            Previous and current potential solutions
+        n_old, n_new, p_old, p_new : numpy arrays
+            Previous and current carrier density solutions
+        poiss : Poisson object
+            Poisson equation object
+        cont_n, cont_p : Continuity objects
+            Continuity equation objects
+        Un, Up : numpy arrays
+            Net generation rates
+        total_error : float
+            Overall convergence error
+        """
+        
+        self.Va_current = Va
+        
+        # Calculate all errors and residuals
+        iter_errors = self.calculate_iteration_errors(V_old, V_new, n_old, n_new, p_old, p_new)
+        _ , poisson_residuals_vector = self.calculate_poisson_residual(V_new, n_new, p_new, poiss)
+        _ , continuity_residuals_n_vector, continuity_residuals_p_vector = self.calculate_continuity_residuals(V_new, n_new, p_new, cont_n, cont_p, Un, Up)
+        
+        return poisson_residuals_vector, continuity_residuals_n_vector, continuity_residuals_p_vector
 
         
     def residual_print(self, Va_step, Va, V_old, V_new, n_old, n_new, p_old, p_new, 
@@ -276,13 +310,13 @@ class ErrorAnalysis():
             Overall convergence error
         """
         
-        self.iteration_count += 1
+        # self.iteration_count += 1
         self.Va_current = Va
         
         # Calculate all errors and residuals
         iter_errors = self.calculate_iteration_errors(V_old, V_new, n_old, n_new, p_old, p_new)
-        poisson_residuals = self.calculate_poisson_residual(V_new, n_new, p_new, poiss)
-        continuity_residuals = self.calculate_continuity_residuals(V_new, n_new, p_new, cont_n, cont_p, Un, Up)
+        poisson_residuals, _ = self.calculate_poisson_residual(V_new, n_new, p_new, poiss)
+        continuity_residuals, _ , _ = self.calculate_continuity_residuals(V_new, n_new, p_new, cont_n, cont_p, Un, Up)
         
         # Combine all results
         all_data = {

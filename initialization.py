@@ -40,30 +40,48 @@ GenRateFileName	self.gen_rate_file_name
 
 import math, constants as const, numpy as np
 
-def is_positive(value, comment):   
-    '''
-    Checks if an input value is positive.
-    Inputs:
-        value:   the input value
-        comment: this is used to be able to output an informative error message, 
-                 if the input value is invalid
-    '''
+# def is_positive(value, comment):   
+#     '''
+#     Checks if an input value is positive.
+#     Inputs:
+#         value:   the input value
+#         comment: this is used to be able to output an informative error message, 
+#                  if the input value is invalid
+#     '''
     
+#     if value <= 0:
+#         print(f"Non-positive input for {comment}\n Input was read as {value}.")
+#         raise ValueError("This input must be positive")
+                    
+# def is_negative(value, comment):
+#     '''
+#     Checks if an input value is positive.
+#     Inputs:
+#         value:   the input value
+#         comment: this is used to be able to output an informative error message, 
+#                  if the input value is invalid
+#     '''
+    
+#     if value >= 0:
+#         print(f"Non-positive input for {comment}\n Input was read as {value}.")
+#         raise ValueError("This input must be negative")
+
+def is_positive(value, comment):
+    """
+    Checks if an input numeric value is strictly positive.
+    如果传入的 value <= 0，就会抛 ValueError，并打印一条提示 comment。
+    """
     if value <= 0:
         print(f"Non-positive input for {comment}\n Input was read as {value}.")
         raise ValueError("This input must be positive")
                     
 def is_negative(value, comment):
-    '''
-    Checks if an input value is positive.
-    Inputs:
-        value:   the input value
-        comment: this is used to be able to output an informative error message, 
-                 if the input value is invalid
-    '''
-    
+    """
+    Checks if an input numeric value is strictly negative.
+    如果传入的 value >= 0，就会抛 ValueError，并打印一条提示 comment。
+    """
     if value >= 0:
-        print(f"Non-positive input for {comment}\n Input was read as {value}.")
+        print(f"Non-negative input for {comment}\n Input was read as {value}.")
         raise ValueError("This input must be negative")
 
 class Params():
@@ -205,7 +223,19 @@ class Params():
             
             tmp = parameters.readline().split()
             self.gen_rate_file_name = tmp[0] 
-            
+
+            # 25. reg_lambda
+            tmp = parameters.readline().split()
+            self.reg_lambda = float(tmp[0])        # 例如：1e-16
+            comment = tmp[1]                       # "reg_lambda"
+            is_positive(self.reg_lambda, comment)
+
+            # 26. newton_damp  —— 本示例要求它必须是负数
+            tmp = parameters.readline().split()
+            self.newton_damp = float(tmp[0])       # 例如：-0.1
+            comment = tmp[1]                       # "newton_damp"
+            is_negative(self.newton_damp, comment)
+
             # calculated parameters
             self.N = self.N_HOMO    
             self.num_cell = math.ceil(self.L/self.dx)  
@@ -215,7 +245,7 @@ class Params():
             self.thermal_voltage = 0.0259
             self.contact_doping = 5.0e25
             self.intrinsic_density = 1.45e16
-            
+
         except:
             print(tmp)
             print("Invalid Input. Fix it and rerun")

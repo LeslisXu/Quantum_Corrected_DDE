@@ -4,7 +4,6 @@ Created on Fri Oct 19, 2018
 
 @author: Tim
 """
-
 import numpy as np
 import constants as const
 from numba import jit
