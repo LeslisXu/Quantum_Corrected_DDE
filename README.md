@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Drift-Diffusion_models
 
 Here is a 1D model written in Python which solves the semiconductor Poisson-Drift-Diffusion equations using finite-differences. This models simulates a solar cell under illumination, but can be adapted to other semiconductor devices as well. It can be modified to solve other systems (i.e. through changing the boundary conditions, adding recombination rates, and modifying the generation rate). 
@@ -41,3 +42,7 @@ The equations are solved using the self-consistent iterative approach called the
 - 设置$S_1=625, S_2=1024,S_3=2048$三种分辨率网格、外置电压范围为[0,2,1.2]，间隔为0.2。
 - 算出来在达到给定方程Residual下Gummel和牛顿法需要达到的收敛次数
 - 算出来在达到一定的旧解和新解之间的误差需要达到的收敛次数。
+=======
+# Quantum_Corrected_DDE
+Gummel and Newton Iteration for solving the quantum-corrected drift-diffusion models.
+>>>>>>> a224fd3216364a4ebc8f205dff353252a49b045b
